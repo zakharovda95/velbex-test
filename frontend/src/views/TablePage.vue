@@ -37,3 +37,9 @@ tablePageStore.init();
 
 const table: Ref<TableDataType[]> = computed(() => tablePageStore.data);
 </script>
+
+<style scoped lang="scss">
+.table-page {
+  padding: 12px;
+}
+</style>

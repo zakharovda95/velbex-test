@@ -1,6 +1,6 @@
 const db = require('../database/postgres.database.js');
 
-class WorkoutController {
+class TableDataController {
   async setData(req, res) {
     res.header('Access-Control-Allow-Origin', '*');
 
@@ -36,4 +36,4 @@ class WorkoutController {
   }
 }
 
-module.exports = new WorkoutController();
+module.exports = new TableDataController();

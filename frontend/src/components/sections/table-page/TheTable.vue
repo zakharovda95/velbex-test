@@ -4,16 +4,22 @@
       <span>{{ title }}</span>
     </div>
     <div class="table-content" v-if="table && table.length">
-      <div class="table-column" v-for="column in columns" :key="column">
+      <div class="header-wrapper">
         <div
-          class="title"
+          v-for="column in columns"
+          :key="column"
+          class="header"
           @click="sort(column)"
           :style="{ cursor: column === TableColumnTitlesEnum.date ? 'not-allowed' : 'pointer' }"
         >
           <span>{{ InterpretationService.getTableColumnTitlesInterpretation(column) }}</span>
           <UISort v-if="currenColumnForSorting === column" />
         </div>
-        <div class="row" v-for="row in table" :key="row">{{ row[column] }}</div>
+      </div>
+      <div class="row" v-for="row in table" :key="row">
+        <div class="column" v-for="column in columns" :key="column">
+          {{ row[column] }}
+        </div>
       </div>
     </div>
     <span class="no-result" v-else>Нет результатов!</span>
@@ -119,31 +125,79 @@ const updateLimit = (limit: number): void => {
 </script>
 
 <style scoped lang="scss">
-.the-table {
-  width: 100%;
-
-  .table-title {
+@media (max-width: 799px) {
+  .the-table {
     width: 100%;
-    font-size: 1.8rem;
-    margin: 12px;
-  }
 
-  .table-content {
-    display: grid;
-    gap: 5px;
-    grid-template-columns: v-bind(columnSizes);
+    .table-title {
+      width: 100%;
+      font-size: 1.2rem;
+      margin: 12px;
+    }
 
-    .table-column {
-      .title {
-        display: flex;
-        justify-content: center;
-        border: 1px solid slategray;
-        font-size: 1.2rem;
+    .table-content {
+      .header-wrapper {
+        display: grid;
+        gap: 5px;
+        grid-template-columns: v-bind(columnSizes);
+        .header {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          border: 1px solid slategray;
+          font-size: 1.1rem;
+        }
       }
       .row {
-        border: 1px solid slategray;
-        font-size: 1.1rem;
-        margin: 5px 0;
+        display: grid;
+        gap: 5px;
+        grid-template-columns: v-bind(columnSizes);
+        .column {
+          border: 1px solid slategray;
+          font-size: 1rem;
+          margin: 5px 0;
+        }
+      }
+    }
+  }
+  .pagination {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 800px) {
+  .the-table {
+    width: 100%;
+
+    .table-title {
+      width: 100%;
+      font-size: 1.8rem;
+      margin: 12px;
+    }
+
+    .table-content {
+      .header-wrapper {
+        display: grid;
+        gap: 5px;
+        grid-template-columns: v-bind(columnSizes);
+        .header {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          border: 1px solid slategray;
+          font-size: 1.2rem;
+        }
+      }
+      .row {
+        display: grid;
+        gap: 5px;
+        grid-template-columns: v-bind(columnSizes);
+        .column {
+          border: 1px solid slategray;
+          font-size: 1.1rem;
+          margin: 5px 0;
+        }
       }
     }
   }

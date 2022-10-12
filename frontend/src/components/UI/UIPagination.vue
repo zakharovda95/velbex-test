@@ -1,7 +1,13 @@
 <template>
   <div class="ui-pagination">
     <div class="page-nums">
-      <div class="page-previous" v-if="page !== 1">&#5130;</div>
+      <div
+        class="page-previous"
+        :class="{ disabled: props.page === 1 }"
+        @click="changePage($event, -1)"
+      >
+        &#5130;
+      </div>
       <div
         :style="{ 'text-decoration': page === pageNum ? 'underline' : 'none' }"
         class="page-number"
@@ -11,7 +17,13 @@
       >
         {{ pageNum }}
       </div>
-      <div class="page-next" v-if="page !== pages">&#5125;</div>
+      <div
+        class="page-next"
+        :class="{ disabled: props.page >= props.pages }"
+        @click="changePage($event, 1)"
+      >
+        &#5125;
+      </div>
     </div>
     <UISelect
       class="select"
@@ -62,11 +74,6 @@ const props = defineProps({
 
 const emit = defineEmits(['custom:change-page', 'custom:update-limit']);
 
-// const pages: Ref<number> = computed(() => {
-//   const length = props.table.length;
-//   return Math.ceil(length / props.limit);
-// });
-
 const limitProxy: Ref<string> = computed({
   get() {
     return String(props.limit);
@@ -76,6 +83,14 @@ const limitProxy: Ref<string> = computed({
     emit('custom:change-page', 1);
   },
 });
+
+const changePage = (event: Event, direction: number): void => {
+  if ((props.page === 1 && direction === -1) || (props.page >= props.pages && direction === 1)) {
+    event.preventDefault();
+  } else {
+    emit('custom:change-page', props.page + direction);
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -103,6 +118,12 @@ const limitProxy: Ref<string> = computed({
     .select {
       margin-left: 20px;
     }
+  }
+
+  .disabled {
+    cursor: not-allowed !important;
+    color: #c0c3c5 !important;
+    border: 1px solid #c0c3c5 !important;
   }
 }
 </style>

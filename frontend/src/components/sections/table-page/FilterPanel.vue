@@ -118,31 +118,62 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.filter-panel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  .title {
-    font-size: 1.6rem;
-    margin: 12px;
-  }
-
-  .actions {
+@media (max-width: 799px) {
+  .filter-panel {
+    width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-    .column-select,
-    .condition-select,
-    .value-row {
-      margin: 20px;
+    .title {
+      font-size: 1.3rem;
+      margin: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+
+      .column-select,
+      .condition-select,
+      .value-row {
+        margin: 20px;
+      }
+    }
+    .button-group {
+      display: flex;
     }
   }
-  .button-group {
+}
+
+@media (min-width: 800px) {
+  .filter-panel {
+    width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .title {
+      font-size: 1.6rem;
+      margin: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+
+      .column-select,
+      .condition-select,
+      .value-row {
+        margin: 20px;
+      }
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 }
 </style>

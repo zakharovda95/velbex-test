@@ -1,6 +1,6 @@
 const express = require('express');
 
-const workoutRouter = require('./src/routes/workout.routes.js');
+const workoutRouter = require('./src/routes/table-data.routes.js');
 
 const app = express();
 

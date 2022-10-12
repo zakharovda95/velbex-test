@@ -19,6 +19,7 @@ import { TableDataType, TablePageStoreType } from '@/helpers/types/table-page-st
 import { TableColumnTitlesEnum } from '@/helpers/enums/table-column-titles.enum';
 
 import { cloneDeep } from 'lodash';
+import moment from 'moment';
 
 export const useTablePageStore = defineStore('tablePageStore', {
   state: () =>
@@ -72,8 +73,9 @@ export const useTablePageStore = defineStore('tablePageStore', {
     },
 
     sortTable() {
-      const inst = new Sort(this.data, this.sort.column, this.sort.param);
+      const inst = new Sort(this.proxyData, this.sort.column, this.sort.param);
       this.data = inst.sort();
+      this.paginate(this.data);
     },
 
     paginate(array: TableDataType[]) {
