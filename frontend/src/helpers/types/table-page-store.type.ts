@@ -1,4 +1,3 @@
-import { TableDataType } from '@/helpers/types/requests/table-data.type';
 import {
   TableColumnNamesEnum,
   TableColumnTitlesEnum,
@@ -13,8 +12,18 @@ export interface TablePageStoreType {
   isLoading: boolean;
   options: OptionsType;
   data: TableDataType[];
+  proxyData: TableDataType[];
+  filterData: TableDataType[];
   sort: SortType;
   filter: FilterType;
+  pagination: PaginationType;
+}
+
+export interface TableDataType {
+  date: number | string;
+  name: string;
+  amount: number;
+  distance: number;
 }
 
 export interface OptionsType {
@@ -23,8 +32,13 @@ export interface OptionsType {
 }
 
 export interface OptionType {
-  name: FiltrationConditionNamesEnum | TableColumnNamesEnum;
-  value: FiltrationConditionTitlesEnum | TableColumnTitlesEnum;
+  name: FiltrationConditionNamesEnum | TableColumnNamesEnum | string;
+  value: FiltrationConditionTitlesEnum | TableColumnTitlesEnum | number;
+}
+
+export interface LimitOptionType {
+  name: string;
+  value: number;
 }
 
 export interface FilterType {
@@ -34,6 +48,13 @@ export interface FilterType {
 }
 
 export interface SortType {
-  column: TableColumnTitlesEnum | string;
-  param: SortConditionsEnum | string;
+  column: TableColumnTitlesEnum;
+  param: SortConditionsEnum;
+}
+
+export interface PaginationType {
+  page: number;
+  pages: number;
+  limit: number;
+  limitOptions: OptionType[];
 }

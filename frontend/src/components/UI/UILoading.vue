@@ -24,7 +24,5 @@ export default defineComponent({
   z-index: 10;
   overflow: hidden;
   font-size: 2rem;
-  color: cadetblue;
-  background: #232323;
 }
 </style>

@@ -2,39 +2,47 @@ import { defineStore } from 'pinia';
 
 import { getData } from '@/helpers/requesters/requests/workout.requests';
 
-import { filterSchema } from '@/helpers/schemas/filter.schema';
-import { optionsSchema } from '@/helpers/schemas/options.schema';
-import { sortSchema } from '@/helpers/schemas/sort.shema';
+import {
+  filterSchema,
+  sortSchema,
+  optionsSchema,
+  paginationSchema,
+} from '@/helpers/schemas/table.shemas';
+import { conditionOptions } from '@/helpers/data/options.data';
 
+import { Sort } from '@/helpers/classes/sort.class';
 import { Filter } from '@/helpers/classes/filter.class';
+import { Pagination } from '@/helpers/classes/pagination.class';
 import { InterpretationService } from '@/services/interpretation.service';
 
-import { TablePageStoreType } from '@/helpers/types/stores/table-page-store.type';
+import { TableDataType, TablePageStoreType } from '@/helpers/types/table-page-store.type';
 import { TableColumnTitlesEnum } from '@/helpers/enums/table-column-titles.enum';
-import {
-  FiltrationConditionNamesEnum,
-  FiltrationConditionTitlesEnum,
-} from '@/helpers/enums/filtration-conditions.enum';
 
-import { cloneDeep, sortBy } from 'lodash';
-import { SortConditionsEnum } from '@/helpers/enums/sort-conditions.enum';
+import { cloneDeep } from 'lodash';
 
 export const useTablePageStore = defineStore('tablePageStore', {
   state: () =>
     ({
-      isLoading: false,
+      isLoading: true,
       data: [],
+      proxyData: [],
+      filterData: [],
       options: cloneDeep(optionsSchema),
       sort: cloneDeep(sortSchema),
       filter: cloneDeep(filterSchema),
+      pagination: cloneDeep(paginationSchema),
     } as TablePageStoreType),
 
   actions: {
-    async getData() {
-      this.isLoading = true;
+    async init() {
       try {
         this.data = await getData();
+        this.proxyData = this.data;
+        this.filterData = this.data;
+
+        this.getOptions();
         this.sortTable();
+        this.paginate(this.proxyData);
       } catch (err) {
         console.log(err);
       } finally {
@@ -52,77 +60,41 @@ export const useTablePageStore = defineStore('tablePageStore', {
         };
       });
 
-      this.options.conditions = [
-        {
-          name: FiltrationConditionNamesEnum.equal,
-          value: FiltrationConditionTitlesEnum.equal,
-        },
-        {
-          name: FiltrationConditionNamesEnum.includes,
-          value: FiltrationConditionTitlesEnum.includes,
-        },
-        {
-          name: FiltrationConditionNamesEnum.more,
-          value: FiltrationConditionTitlesEnum.more,
-        },
-        {
-          name: FiltrationConditionNamesEnum.less,
-          value: FiltrationConditionTitlesEnum.less,
-        },
-      ];
+      this.options.conditions = conditionOptions;
     },
 
     async filterTable() {
-      await this.getData();
-
-      if (this.data) {
-        const filter = new Filter(this.data, this.filter);
-
-        this.data = filter.filterTable();
-      }
+      this.pagination.page = 1;
+      const inst = new Filter(this.proxyData, this.filter);
+      this.data = inst.filterTable();
+      this.filterData = this.data;
+      this.paginate(this.filterData);
     },
 
     sortTable() {
-      if (this.sort.column !== TableColumnTitlesEnum.name) {
-        if (this.sort.param === SortConditionsEnum.desc) {
-          this.data = sortBy(this.data, [
-            obj => {
-              const elem: { [key: string]: any } = obj;
-              return elem[this.sort.column];
-            },
-          ]);
-        } else {
-          this.data = sortBy(this.data, [
-            obj => {
-              const elem: { [key: string]: any } = obj;
-              return -elem[this.sort.column];
-            },
-          ]);
-        }
-      } else {
-        const param = (a: any, b: any) => a.name.localeCompare(b.name);
+      const inst = new Sort(this.data, this.sort.column, this.sort.param);
+      this.data = inst.sort();
+    },
 
-        if (this.sort.param === SortConditionsEnum.desc) {
-          this.data = this.data.sort(param);
-        } else {
-          this.data = this.data.sort(param).reverse();
-        }
-      }
+    paginate(array: TableDataType[]) {
+      this.pagination.pages = Math.ceil(array.length / this.pagination.limit);
+
+      const inst = new Pagination(array, this.pagination.limit, this.pagination.page);
+      this.data = inst.paginate();
     },
 
     random() {
-      if (this.data) {
-        this.data = this.data.sort(() => Math.random() - 0.5);
-      }
+      this.data = this.proxyData.sort(() => Math.random() - 0.5);
+      this.paginate(this.proxyData);
     },
 
     async reset() {
       this.options = cloneDeep(optionsSchema);
       this.filter = cloneDeep(filterSchema);
       this.sort = cloneDeep(sortSchema);
+      this.pagination = cloneDeep(paginationSchema);
 
-      await this.getData();
-      await this.getOptions();
+      await this.init();
     },
   },
 });

@@ -48,9 +48,8 @@ import UISelect from '@/components/UI/UISelect';
 import UIInput from '@/components/UI/UIInput.vue';
 import UIButton from '@/components/UI/UIButton.vue';
 
-import { FilterType } from '@/helpers/types/stores/table-page-store.type';
-import { OptionType } from '@/helpers/types/stores/table-page-store.type';
-import { TableDataType } from '@/helpers/types/requests/table-data.type';
+import { FilterType } from '@/helpers/types/table-page-store.type';
+import { OptionType } from '@/helpers/types/table-page-store.type';
 import { TableColumnTitlesEnum } from '@/helpers/enums/table-column-titles.enum';
 import { FiltrationConditionTitlesEnum } from '@/helpers/enums/filtration-conditions.enum';
 
@@ -60,10 +59,7 @@ import { computed, Ref, watch } from 'vue';
 
 const tablePageStore = useTablePageStore();
 
-tablePageStore.getOptions();
-
 const filtersConfig: Ref<FilterType> = computed(() => tablePageStore.filter);
-const table: Ref<TableDataType[]> = computed(() => tablePageStore.data);
 const columnOptions: Ref<OptionType[]> = computed(() => tablePageStore.options.columns);
 const conditionOptions: Ref<OptionType[]> = computed(() => tablePageStore.options.conditions);
 
@@ -80,7 +76,7 @@ const filteredConditionOptions = computed(() => {
   });
 });
 
-const columnValue: Ref<string> | Ref<null> = computed({
+const columnValue: Ref<TableColumnTitlesEnum> = computed({
   get() {
     return tablePageStore.filter.column;
   },
@@ -89,7 +85,7 @@ const columnValue: Ref<string> | Ref<null> = computed({
   },
 });
 
-const conditionValue: Ref<string> | Ref<null> = computed({
+const conditionValue: Ref<FiltrationConditionTitlesEnum> = computed({
   get() {
     return tablePageStore.filter.condition;
   },
@@ -113,7 +109,8 @@ watch(
     if (columnValue.value && conditionValue.value && filterValue.value) {
       tablePageStore.filterTable();
     } else {
-      tablePageStore.getData();
+      tablePageStore.data = tablePageStore.proxyData;
+      tablePageStore.paginate(tablePageStore.proxyData);
     }
   },
   { deep: true },

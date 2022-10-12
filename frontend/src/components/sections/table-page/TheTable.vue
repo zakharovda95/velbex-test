@@ -2,7 +2,6 @@
   <div class="the-table">
     <div class="table-title">
       <span>{{ title }}</span>
-      {{ currenColumnForSorting }}
     </div>
     <div class="table-content" v-if="table && table.length">
       <div class="table-column" v-for="column in columns" :key="column">
@@ -18,6 +17,16 @@
       </div>
     </div>
     <span class="no-result" v-else>Нет результатов!</span>
+    <div class="pagination">
+      <UIPagination
+        :pages="tablePageStore.pagination.pages"
+        :page="tablePageStore.pagination.page"
+        :limit="tablePageStore.pagination.limit"
+        :limit-options="tablePageStore.pagination.limitOptions"
+        @custom:change-page="changePage"
+        @custom:update-limit="updateLimit"
+      />
+    </div>
   </div>
 </template>
 
@@ -31,10 +40,11 @@ export default defineComponent({
 
 <script setup lang="ts">
 import UISort from '@/components/UI/UISort.vue';
+import UIPagination from '@/components/UI/UIPagination.vue';
 
 import { InterpretationService } from '@/services/interpretation.service';
 
-import { TableDataType } from '@/helpers/types/requests/table-data.type';
+import { TableDataType } from '@/helpers/types/table-page-store.type';
 import { TableColumnTitlesEnum } from '@/helpers/enums/table-column-titles.enum';
 
 import { defineProps, computed, PropType, Ref } from 'vue';
@@ -61,27 +71,25 @@ const props = defineProps({
 
 const tablePageStore = useTablePageStore();
 
-const sort = (column: TableColumnTitlesEnum | string): void => {
+const sort = (column: TableColumnTitlesEnum): void => {
   if (column === TableColumnTitlesEnum.date) {
     return;
   } else {
     if (tablePageStore.sort.column !== column) {
       tablePageStore.sort.column = column;
       tablePageStore.sort.param = SortConditionsEnum.asc;
-      tablePageStore.sortTable();
     } else {
       if (tablePageStore.sort.param === SortConditionsEnum.asc) {
         tablePageStore.sort.param = SortConditionsEnum.desc;
-        tablePageStore.sortTable();
       } else {
         tablePageStore.sort.param = SortConditionsEnum.asc;
-        tablePageStore.sortTable();
       }
     }
+    tablePageStore.sortTable();
   }
 };
 
-const currenColumnForSorting: Ref<TableColumnTitlesEnum> | Ref<string> = computed(
+const currenColumnForSorting: Ref<TableColumnTitlesEnum> = computed(
   () => tablePageStore.sort.column,
 );
 
@@ -98,6 +106,16 @@ const columns: Ref<TableColumnTitlesEnum[]> = computed(() => {
   const columnTitles = Object.keys(props.table[0]);
   return columnTitles as TableColumnTitlesEnum[];
 });
+
+const changePage = (page: number): void => {
+  tablePageStore.pagination.page = page;
+  tablePageStore.paginate(tablePageStore.filterData);
+};
+
+const updateLimit = (limit: number): void => {
+  tablePageStore.pagination.limit = limit;
+  tablePageStore.paginate(tablePageStore.filterData);
+};
 </script>
 
 <style scoped lang="scss">
@@ -121,7 +139,6 @@ const columns: Ref<TableColumnTitlesEnum[]> = computed(() => {
         justify-content: center;
         border: 1px solid slategray;
         font-size: 1.2rem;
-        cursor: v-bind(cursor);
       }
       .row {
         border: 1px solid slategray;
@@ -129,6 +146,10 @@ const columns: Ref<TableColumnTitlesEnum[]> = computed(() => {
         margin: 5px 0;
       }
     }
+  }
+  .pagination {
+    display: flex;
+    justify-content: center;
   }
 }
 </style>

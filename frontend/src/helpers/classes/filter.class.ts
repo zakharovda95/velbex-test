@@ -1,5 +1,5 @@
-import { FilterType } from '@/helpers/types/stores/table-page-store.type';
-import { TableDataType } from '@/helpers/types/requests/table-data.type';
+import { FilterType } from '@/helpers/types/table-page-store.type';
+import { TableDataType } from '@/helpers/types/table-page-store.type';
 import { FiltrationConditionTitlesEnum } from '@/helpers/enums/filtration-conditions.enum';
 import { TableColumnTitlesEnum } from '@/helpers/enums/table-column-titles.enum';
 
@@ -19,7 +19,7 @@ export class Filter {
       const elem: { [key: string]: any } = obj;
 
       if (elem.amount && this.filter.condition === FiltrationConditionTitlesEnum.equal) {
-        return elem[this.filter.column] === this.filter.value;
+        return elem[this.filter.column] === +this.filter.value;
       }
 
       if (elem.amount && this.filter.condition === FiltrationConditionTitlesEnum.includes) {

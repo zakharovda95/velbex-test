@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UILoading v-if="tablePageStore.isLoading && !tablePageStore.data" />
+    <UILoading v-if="tablePageStore.isLoading && !tablePageStore.data.length" />
     <div v-else class="table-page">
       <FilterPanel />
       <TheTable
@@ -26,16 +26,14 @@ import TheTable from '@/components/sections/table-page/TheTable.vue';
 
 import { useTablePageStore } from '@/stores/table-page.store';
 
-import { TableDataType } from '@/helpers/types/requests/table-data.type';
+import { TableDataType } from '@/helpers/types/table-page-store.type';
 
 import { computed, Ref } from 'vue';
 import FilterPanel from '@/components/sections/table-page/FilterPanel.vue';
 
 const tablePageStore = useTablePageStore();
 
-tablePageStore.getData();
+tablePageStore.init();
 
 const table: Ref<TableDataType[]> = computed(() => tablePageStore.data);
 </script>
-
-<style scoped lang="scss"></style>

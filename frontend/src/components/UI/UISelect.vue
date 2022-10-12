@@ -1,7 +1,7 @@
 <template>
   <div class="ui-select">
     <select v-bind="$attrs" @change="modelValueProxy = $event.target.value">
-      <option selected>{{ preview }}</option>
+      <option v-if="preview" selected>{{ preview }}</option>
       <option v-for="option in options" :key="option.value" :value="option.value">
         {{ option.name }}
       </option>
@@ -19,13 +19,13 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { OptionType } from '@/helpers/types/stores/table-page-store.type';
+import { OptionType } from '@/helpers/types/table-page-store.type';
 
 import { computed, defineProps, PropType, defineEmits } from 'vue';
 
 const props = defineProps({
   options: {
-    type: Array as PropType<OptionType[]>,
+    type: Array as PropType<OptionType[] | number[]>,
     required: true,
   },
   modelValue: {
@@ -35,7 +35,7 @@ const props = defineProps({
   preview: {
     type: String,
     required: false,
-    default: () => 'Выбор значения',
+    default: () => '',
   },
 });
 
